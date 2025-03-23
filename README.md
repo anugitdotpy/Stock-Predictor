@@ -86,7 +86,8 @@ This service loads a TTS model (e.g., `tts_models/de/thorsten/tacotron2-DDC`) an
 The `streamlit.py` file in the root directory provides a user interface to interact with these services. To run the UI locally, ensure you have Streamlit installed, then execute:
 
 ```bash
-python streamlit.py
+pip install streamlit fpdf
+streamlit run streamlit.py
 ```
 
 This will start the Streamlit UI in your browser, allowing you to:
