@@ -305,7 +305,6 @@ def parse_and_aggregate_articles(request, articles):
             continue
 
         soup = BeautifulSoup(response.text, "html.parser")
-
         full_text = None
 
         json_ld_tags = soup.find_all("script", attrs={"type": "application/ld+json"})
@@ -341,7 +340,7 @@ def parse_and_aggregate_articles(request, articles):
         else:
             print("[!] Could not extract the full article text.")
         processed_articles.append(single_article)
-    return analyze_finbert_sentiment(request, articles)
+    return analyze_finbert_sentiment(request, processed_articles)
 
 
 def scrape_indian_express_api_fil(
@@ -500,17 +499,10 @@ def determine_final_sentiment(sentiment_distribution):
     pos = sentiment_distribution.get("Positive", 0)
     neg = sentiment_distribution.get("Negative", 0)
     neu = sentiment_distribution.get("Neutral", 0)
-
-    # Determine the highest count
     max_val = max(pos, neg, neu)
-
-    # Identify sentiments with the maximum count
     highest = [s for s, count in {"Positive": pos, "Negative": neg, "Neutral": neu}.items() if count == max_val]
-
-    # If only one sentiment has the highest count, return it
     if len(highest) == 1:
         return highest[0]
-    # If there is a tie, apply the tie-breaking rules
     else:
         sentiment_set = set(highest)
         if sentiment_set == {"Positive", "Neutral"}:
@@ -519,7 +511,6 @@ def determine_final_sentiment(sentiment_distribution):
             return "Negative"
         elif sentiment_set == {"Positive", "Negative"}:
             return "Neutral"
-        # If all three are equal, you can decide a default (here choosing Neutral)
         elif sentiment_set == {"Positive", "Negative", "Neutral"}:
             return "Neutral"
 

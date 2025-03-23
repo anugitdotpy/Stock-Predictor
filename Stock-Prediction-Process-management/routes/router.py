@@ -74,7 +74,7 @@ async def process_input(request: Request, query: ArticleQuery):
         elif final_sentiment == "Negative":
             response_data["Final Sentiment Analysis"] = f"{query.search_query}'s overall news coverage is negative. Potential stock decline is expected"
         else:
-            response_data["Final Sentiment Analysis"] = f"{query.search_query}'s overall news coverage is negative. Less chance for any large variation in stock statistics"
+            response_data["Final Sentiment Analysis"] = f"{query.search_query}'s overall news coverage is neutral. Less chance for any large variation in stock statistics"
         # Write the response data to the file as JSON
         converted_response = convert_sets_to_lists(response_data)
         with open(output_path, "w") as f:
