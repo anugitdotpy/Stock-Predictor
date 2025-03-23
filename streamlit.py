@@ -1,8 +1,18 @@
 import streamlit as st
 import requests
 import json
+from fpdf import FPDF
 
-# Set the base URL of your FastAPI server. Adjust if needed.
+def json_to_pdf(obj: dict) -> bytes:
+    pdf = FPDF()
+    pdf.set_auto_page_break(True, margin=15)
+    pdf.add_page()
+    pdf.set_font("Courier", size=9)
+    text = json.dumps(obj, indent=2)
+    for line in text.split("\n"):
+        pdf.multi_cell(0, 5, line)
+    return pdf.output(dest="S").encode("latin-1")
+
 PROCESS_URL = "https://techiespark-stock-prediction-process-management.hf.space/process-management/process-input"
 TTS_URL = "https://techiespark-stock-predictor-hindi-tts-management.hf.space/synthesize"
 
@@ -32,30 +42,29 @@ if submitted_articles:
         st.info("Requesting articles...")
         try:
             response = requests.post(PROCESS_URL, json=payload)
-            if response.status_code == 200:
-                file_bytes = response.content
-                json_data = json.loads(file_bytes)
-                # Store data in session_state
-                st.session_state.json_data = json_data
-                st.session_state.articles_file_bytes = file_bytes
-                st.success("Articles JSON is ready!")
-            else:
-                st.error(f"Error: {response.status_code} - {response.text}")
-        except Exception as e:
-            st.error(f"An error occurred: {e}")
+            response.raise_for_status()
+            full = response.json()
+            data = full.get("response", {}) 
+            st.session_state.hindi_text = data.pop("hindi_translation", "")
 
-# Place the download button outside the form.
-if "articles_file_bytes" in st.session_state:
+            pdf_bytes = json_to_pdf(data)
+            st.session_state.pdf_bytes = pdf_bytes
+
+            st.success("Articles processed — download PDF below!")
+        except Exception as e:
+            st.error(f"Error: {e}")
+
+if "pdf_bytes" in st.session_state:
     st.download_button(
-        label="Download Articles JSON",
-        data=st.session_state.articles_file_bytes,
-        file_name=f"news_summary_{search_query}.json",
-        mime="application/json"
+        label="Download Summary PDF",
+        data=st.session_state.pdf_bytes,
+        file_name=f"news_summary_{search_query}.pdf",
+        mime="application/pdf"
     )
 
 st.markdown("---")
 st.markdown("## 2. TTS Synthesis and Download Audio")
-if "json_data" not in st.session_state or not st.session_state.json_data.get("hindi_translation"):
+if "hindi_text" not in st.session_state:
     st.warning("Please retrieve articles with a valid Hindi translation before synthesizing speech.")
 else:
     with st.form("tts_form"):
@@ -63,22 +72,20 @@ else:
         submitted_tts = st.form_submit_button("Synthesize Speech")
     
     if submitted_tts:
-        hindi_text = st.session_state.json_data["hindi_translation"]
+        hindi_text = st.session_state.hindi_text
         payload = {"text": hindi_text, "filename": tts_filename}
         st.info("Synthesizing speech...")
         try:
             response = requests.post(TTS_URL, json=payload)
             if response.status_code == 200:
                 file_bytes = response.content
-                # Store synthesized audio bytes in session_state
                 st.session_state.audio_file_bytes = file_bytes
                 st.success("Audio file is ready!")
             else:
                 st.error(f"Error: {response.status_code} - {response.text}")
         except Exception as e:
             st.error(f"An error occurred: {e}")
-    
-    # Place the download button outside the form.
+
     if "audio_file_bytes" in st.session_state:
         st.download_button(
             label="Download Audio File",

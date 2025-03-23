@@ -1,10 +1,18 @@
+import os
+os.environ["HOME"] = "/tmp"
+os.environ["XDG_CACHE_HOME"] = "/tmp/.cache"
+os.environ["MPLCONFIGDIR"] = "/tmp/.config/matplotlib"
+os.environ["NUMBA_CACHE_DIR"] = "/tmp/numba_cache"
+
+# Create the directories up front
+for d in ("/tmp/.cache", "/tmp/.config/matplotlib", "/tmp/numba_cache", "/tmp/.local/share/tts_models"):
+    os.makedirs(d, exist_ok=True)
+
 from fastapi import FastAPI, HTTPException
 from fastapi.responses import FileResponse
 from starlette.background import BackgroundTask
 
 from pydantic import BaseModel
-import os
-# os.environ["NUMBA_CACHE_DISABLE"] = "1"
 from TTS.api import TTS
 app = FastAPI()
 
