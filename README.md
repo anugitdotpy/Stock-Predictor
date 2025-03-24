@@ -1,6 +1,6 @@
 # Stock Predictor System
 
-[Link to usage video]("https://www.loom.com/share/fabe67b9fe274c52b18c7d97236c98a7?sid=ddf418f0-018e-448a-a2b0-81e249a218f4")
+[Link to usage video](https://www.loom.com/share/fabe67b9fe274c52b18c7d97236c98a7?sid=ddf418f0-018e-448a-a2b0-81e249a218f4)
 
 This repository contains a multi-service stock prediction framework that includes the following components:
 
