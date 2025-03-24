@@ -1,5 +1,7 @@
 # Stock Predictor System
 
+[Link to usage video]("https://www.loom.com/share/fabe67b9fe274c52b18c7d97236c98a7?sid=ddf418f0-018e-448a-a2b0-81e249a218f4")
+
 This repository contains a multi-service stock prediction framework that includes the following components:
 
 1. **Stock-Prediction-Process-management:**  
@@ -83,6 +85,7 @@ This service loads a TTS model (e.g., `tts_models/de/thorsten/tacotron2-DDC`) an
 
 ## Running the Streamlit UI
 
+
 The `streamlit.py` file in the root directory provides a user interface to interact with these services. To run the UI locally, ensure you have Streamlit installed, then execute:
 
 ```bash
@@ -93,6 +96,10 @@ streamlit run streamlit.py
 This will start the Streamlit UI in your browser, allowing you to:
 - Scrape and process articles (handled by the Process Management service).
 - Synthesize speech from the processed Hindi text (handled by the TTS service).
+
+The `streamlit.py` is currently configured to call API's of instances hosted in Huggingface Spaces, if you want it to point to your local instances, you can modify the variables *PROCESS_URL* and *TTS_URL* present inside the `streamlit.py`
+
+*Note: The spaces in huggingface might be on sleep due to inactivity, so the frst API call might take a higher time to get processed.*
 
 ---
 
